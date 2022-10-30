@@ -20,9 +20,6 @@ const getSignedThumbnailurl = async (photo_hash, setRefetchedUrl) => {
 }
 
 const PhotoEach = ({ onClose, thumbnail_url, photo_hash }) => {
-    // link to contract address
-    // metadata
-    // download photo to phone 
 
     const openAddress = useCallback(() => {
         const url = `https://explorer.celo.org/mainnet/address/${photo_hash}/transactions`
@@ -42,15 +39,17 @@ const PhotoEach = ({ onClose, thumbnail_url, photo_hash }) => {
                 </TouchableOpacity>
             </View>
             <Text></Text>
-            <Text style={{ ...formTitle, marginTop: 0, marginBottom: 10 }}>My Sick Photo</Text>
-            <Image
-                {...{
-                    source: {
-                        uri: thumbnail_url
-                    },
-                    style: { width: photoSize + 100, height: photoSize + 100 },
-                }}
-            />
+            <Text style={{ ...formTitle, marginTop: 0, marginBottom: 10 }}>{photo_hash.slice(0, 10)}...</Text>
+            <View style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <Image
+                    {...{
+                        source: {
+                            uri: thumbnail_url
+                        },
+                        style: { width: photoSize + 100, height: photoSize + 100 },
+                    }}
+                />
+            </View>
             <TouchableOpacity
                 style={{
                     display: "flex",
@@ -65,7 +64,7 @@ const PhotoEach = ({ onClose, thumbnail_url, photo_hash }) => {
             >
                 <MaterialIcons name="link" size={50} color="black" />
                 <Text style={{ fontSize: 20 }}>View Smart Contract</Text>
-                <Text style={{ fontSize: 20 }}>{` ${photo_hash.slice(0, 5)}...`}</Text>
+                {/* <Text style={{ fontSize: 20 }}>{` ${photo_hash.slice(0, 5)}...`}</Text> */}
             </TouchableOpacity>
 
         </View>
@@ -224,20 +223,22 @@ const PhotoList = ({ navigation }) => {
     )
 }
 
+export const transparentOpacity = {
+    alignItems: "center",
+    justifyContent: "flex-start",
+    height: photoSize,
+    width: photoSize,
+    padding: 0,
+    margin: 0,
+    backgroundColor: "transparent"
+}
+
 const styles = StyleSheet.create({
     container: {
         // flex: 1,
         marginTop: StatusBar.currentHeight + 5,
     },
-    transparentOpacity: {
-        alignItems: "center",
-        justifyContent: "flex-start",
-        height: photoSize,
-        width: photoSize,
-        padding: 0,
-        margin: 0,
-        backgroundColor: "transparent"
-    }
+    transparentOpacity
     // item: {
     //     backgroundColor: '#f9c2ff',
     //     height: 150,

@@ -5,16 +5,19 @@ import { Text, View, TouchableOpacity } from "../components/Themed";
 import Colors from "../constants/Colors";
 import React from "react";
 import PageBackground from "../shared/PageBackground";
+import { OrangeButton } from "./UploadPhoto";
 
 export default function WalletConnectionScreen({
-	navigation,
 }: RootStackScreenProps<"Root">) {
 	const connector = useWalletConnect();
 	return (
 		<PageBackground>
-			<TouchableOpacity onPress={() => connector.connect()}>
-				<Text style={{ fontSize: 16 }}>Connect Wallet</Text>
-			</TouchableOpacity>
+			<OrangeButton
+				onPress={() => connector.connect()}
+				extraStyles={{ marginTop: 30, width: "80%" }}
+			>
+				<Text style={{ fontSize: "24px", fontWeight: "bold" }}>Connect Wallet</Text>
+			</OrangeButton>
 		</PageBackground>
 	);
 }

@@ -1,29 +1,29 @@
 
-import React, { useEffect } from 'react';
-import { View, Image, Button, Platform, Text, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Image, Text, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Auth } from 'aws-amplify';
-import { securedCognitoFetch, securedCognitoPost, signedUploadUrlEndpoint } from '../server';
+import { securedCognitoFetch, signedUploadUrlEndpoint } from '../server';
 import { MaterialIcons } from '@expo/vector-icons';
-import { isEmpty, isNull } from 'lodash';
+import { isEmpty } from 'lodash';
 import uuid from 'react-native-uuid';
 import PageBackground from '../shared/PageBackground';
 import { useWalletConnect } from '@walletconnect/react-native-dapp';
 import WalletConnectionScreen from './WalletConnectionScreen';
 import createContract from './createContract/createContract';
-// import MetapxylLogo from '../shared/MetapxylLogo';
+import { transparentOpacity } from './PhotoList';
 
-const photoBoxSize = 350
+const photoBoxSize = 250
 const buttonSize = 18
 
 const today = new Date(Date.now()).toISOString().split("T")[0];
 
-const OrangeButton = ({ children, onPress }) => {
+export const OrangeButton = ({ children, onPress, extraStyles }) => {
     return (
         <View style={{
             borderRadius: 20,
             backgroundColor: "#FBB600",
-
+            ...extraStyles
         }}>
             <TouchableOpacity {...{
                 onPress, style: {
@@ -39,59 +39,10 @@ const OrangeButton = ({ children, onPress }) => {
     )
 }
 
-const BottomSelectButtons = ({ openModal, choosePhoto }) => {
-
-    return (
-        <View
-            style={{
-                flexDirection: "row",
-                justifyContent: "space-evenly",
-                width: "100%",
-                marginTop: "20%"
-            }}
-        >
-            <OrangeButton {...{
-                onPress: openModal
-            }}>
-                <MaterialIcons name="enhanced-encryption" size={buttonSize} color={"white"} />
-                <Text style={{ fontSize: buttonSize, color: "white" }}>Metamark</Text>
-            </OrangeButton>
-            <OrangeButton {...{
-                onPress: choosePhoto
-            }}>
-                <MaterialIcons name="photo" size={buttonSize} color={"white"} />
-                <Text style={{ fontSize: buttonSize, color: "white" }}>Select Photo</Text>
-            </OrangeButton>
-        </View>
-
-    )
-}
-
-const SelectPhotoBox = ({ onPress }) => {
-
-    return (
-        <TouchableOpacity {...{ onPress }}>
-
-            <View
-                style={{
-                    backgroundColor: "white",
-                    height: photoBoxSize,
-                    width: photoBoxSize,
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
-            >
-                <Text style={{ ...styles.uploadText }}>Select Photo to Metamark</Text>
-            </View>
-        </TouchableOpacity>
-
-    )
-}
-
 export const ModalContainer = ({ children }) => {
     return (
         <View style={{ height: "100%", width: "100%", justifyContent: "flex-end", alignItems: "center" }}>
-            <View style={{ backgroundColor: "white", height: "70%", width: photoBoxSize }}>
+            <View style={{ backgroundColor: "white", height: "70%", width: "95%" }}>
                 {children}
             </View>
         </View>
@@ -113,6 +64,14 @@ const UploadPhoto = ({ navigation }) => {
     const [isVerifyModalOpen, setIsVerifyModalOpen] = React.useState(null)
     const [isUploadingModalOpen, setIsUploadingModalOpen] = React.useState(false)
     const [photoHash, setPhotoHash] = React.useState(uuid.v4())
+
+    const selectedPhotoName = useMemo(() => {
+        if (!isEmpty(selectedPhoto) && !isEmpty(selectedPhoto?.uri)) {
+            return selectedPhoto.uri.split("/ImagePicker/")[1]
+        }
+        return ""
+    }, [selectedPhoto])
+
 
     const openModal = () => setIsVerifyModalOpen(true)
 
@@ -205,11 +164,11 @@ const UploadPhoto = ({ navigation }) => {
             >
                 <ModalContainer>
                     <View style={{ margin: 20 }}>
-                        <Text style={styles.formTitle}>Metadata</Text>
+                        <Text style={styles.formTitle}>Smart Contract Metadata</Text>
                         <BlackLine />
                         <Text style={styles.formInput}>{`Image Author:   Jonathan Cannon`}</Text>
                         <BlackLine />
-                        <Text style={styles.formInput}>{`Photo Name:   My Sick Photo`}</Text>
+                        <Text style={styles.formInput}>{`Photo Name:   ${selectedPhotoName}`}</Text>
                         <BlackLine />
                         <Text style={styles.formInput}>{`Date Created:   ${today}`}</Text>
                         <BlackLine />
@@ -222,13 +181,8 @@ const UploadPhoto = ({ navigation }) => {
                             <MaterialIcons name="assignment" size={24} color="black" />
                             <Text style={styles.formInput}>ERC-721</Text>
                         </View>
-                        <View style={styles.contractBox}>
-
-                            <MaterialIcons name="assignment" size={24} color="black" />
-                            <Text style={styles.formInput}>ERC-1155</Text>
-                        </View>
                         <View style={{ height: 50 }} />
-                        <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-evenly" }}>
+                        <View style={{ display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: 150 }}>
                             <OrangeButton {...{
                                 onPress: handleUploadPhoto
                             }}>
@@ -275,18 +229,71 @@ const UploadPhoto = ({ navigation }) => {
                     </View>
                 </ModalContainer>
             </Modal>
-            <View style={{ margin: 15 }}>
-                {/* <MetapxylLogo /> */}
+            <View style={{
+                margin: 15,
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                justifyContent: "flex-start",
+                alignItems: "center"
+            }}>
+                <Image
+                    source={require('../shared/logo.png')}
+                    style={{
+                        width: "50%",
+                        height: "35%"
+                    }}
+                />
+
+
                 {!isEmpty(selectedPhoto) && !selectedPhoto?.cancelled ? (
                     <>
-                        <Image
-                            source={{ uri: selectedPhoto.uri }}
-                            style={{ width: photoBoxSize, height: photoBoxSize }} />
-                        <BottomSelectButtons {...{ openModal, choosePhoto }} />
+                        <TouchableOpacity style={transparentOpacity} onPress={choosePhoto}>
+                            <Image
+                                source={{ uri: selectedPhoto.uri }}
+                                style={{ marginTop: 50, width: photoBoxSize, height: photoBoxSize }}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={openModal}
+                            style={{
+                                marginTop: 225,
+                                height: 60,
+                                width: 200,
+                                backgroundColor: "#008DC9",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                borderRadius: 50,
+                                borderWidth: 3,
+                                borderColor: "white",
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    color: "white",
+                                    fontSize: "24px"
+                                }}
+                            >
+                                Upload
+                            </Text>
+                        </TouchableOpacity>
                     </>
                 ) : (
-                    <></>
-                    // <SelectPhotoBox onPress={choosePhoto} />
+                    <TouchableOpacity
+                        style={transparentOpacity}
+                        onPress={choosePhoto}
+                    >
+                        <Image
+                            source={require('../shared/UploadButton.png')}
+                            style={{
+                                marginTop: 50,
+                                height: 216 / 1.25,
+                                width: 219 / 1.25,
+                                resizeMode: 'contain',
+                            }}
+                        />
+                    </TouchableOpacity>
                 )}
 
                 {!isEmpty(error) ? (
@@ -297,7 +304,7 @@ const UploadPhoto = ({ navigation }) => {
                     <Text>{alert} </Text>
                 ) : (<></>)}
             </View>
-        </PageBackground>
+        </PageBackground >
     );
 };
 
@@ -313,6 +320,7 @@ export const formTitle = {
 const styles = {
     formTitle,
     formInput: {
+        marginTop: 10,
         color: "#6C6C6C",
         fontSize: 20,
     },

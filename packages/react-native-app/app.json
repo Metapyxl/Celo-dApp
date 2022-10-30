@@ -1,7 +1,8 @@
 {
 	"expo": {
-		"name": "Metapxyl-dApp",
-		"slug": "metapxyl-dApp",
+		"owner": "iamjoncannon",
+		"name": "metapxyl-celo-dapp",
+		"slug": "metapxyl-celo-dapp",
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/images/icon.png",
