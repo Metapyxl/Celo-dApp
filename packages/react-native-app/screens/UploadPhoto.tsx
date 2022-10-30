@@ -126,9 +126,7 @@ const UploadPhoto = ({ navigation }) => {
             setStage(UPLOADING_STAGE)
 
             const signedUploadUrlEndpointResponse = await securedCognitoFetch(signedUploadUrlEndpoint, otherHeaders);
-
             const signedUploadUrlEndpointForPhotoBody = await signedUploadUrlEndpointResponse.json();
-
             const { s3UploadUrl } = signedUploadUrlEndpointForPhotoBody;
 
             const response = await fetch(photoLocation);
@@ -317,6 +315,7 @@ export const formTitle = {
     color: "#6C6C6C",
 
 }
+
 const styles = {
     formTitle,
     formInput: {
