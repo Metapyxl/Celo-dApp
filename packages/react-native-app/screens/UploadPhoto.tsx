@@ -56,6 +56,17 @@ const UPLOADED_STAGE = "UPLOADED_STAGE"
 
 const UploadPhoto = ({ navigation }) => {
     const walletConnection = useWalletConnect();
+    const [userEmail, setUserEmail] = React.useState(null);
+
+    React.useEffect(() => {
+        if (isEmpty(userEmail)) {
+            async function getUser() {
+                const user = await Auth.currentAuthenticatedUser();
+                setUserEmail(user?.attributes?.email)
+            }
+            getUser()
+        }
+    })
 
     const [selectedPhoto, setSelectedPhoto] = React.useState(null);
     const [stage, setStage] = React.useState(CONTRACT_DEPLOYING_STAGE);
@@ -164,7 +175,7 @@ const UploadPhoto = ({ navigation }) => {
                     <View style={{ margin: 20 }}>
                         <Text style={styles.formTitle}>Smart Contract Metadata</Text>
                         <BlackLine />
-                        <Text style={styles.formInput}>{`Image Author:   Jonathan Cannon`}</Text>
+                        <Text style={styles.formInput}>{`Image Author:   ${userEmail}`}</Text>
                         <BlackLine />
                         <Text style={styles.formInput}>{`Photo Name:   ${selectedPhotoName}`}</Text>
                         <BlackLine />
